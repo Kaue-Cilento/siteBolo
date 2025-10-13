@@ -1,0 +1,182 @@
+*{
+  font-family: "Comic Sans MS", cursive;
+  overflow: hidden;
+}
+
+body {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+header{
+  position: relative;
+}
+
+.Logo {
+  width: 100px;
+  margin-bottom: 20px;
+}
+
+header div{
+  position: absolute;
+  width: 100%;
+  background: rgb(255, 133, 133);
+  padding: 20px;
+  padding-bottom: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  clip-path: ellipse(100% 85% at 50% 0%);
+  z-index: 1;
+}
+
+header a, header img{
+  text-decoration: none;
+  color: white;
+  font-size: 30px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+header a:hover{
+  transform: scale(1.10);
+}
+
+h3{
+  color: rgb(139, 69, 19);
+  height: fit-content;
+  margin-top: 0;
+  max-width: 60%;
+}
+
+footer {
+  background: linear-gradient(to top, rgb(255, 133, 133), rgb(187, 99, 99));
+  color: white;
+  text-align: center;
+  padding: 80px 20px;
+  border-top: 3px solid white;
+  font-family: "Comic Sans MS", cursive;
+  letter-spacing: 0.5px;
+  clip-path: ellipse(100% 50% at 50% 75%);
+}
+
+footer span {
+  font-size: 23px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+footer p {
+  margin: 5px;
+  font-weight: bold;
+}
+
+.bolos{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.slogan{
+  display: flex;
+  justify-content: center;
+  font-size: 50px;
+  color: white;
+  position: absolute;
+  top: 35%;
+  width: 40%;
+  text-align: center;
+  text-shadow: 2px 2px 12px #000000;
+  font-family: "Pacifico", cursive;
+}
+
+.slogan-section{
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.img-slogan{
+  object-fit: cover;
+  width: 120%;
+  height: 400px;
+  filter: blur(3px);
+  clip-path: inset(8px);
+  transform: scale(1.02);
+  margin-top: 70px;
+}
+
+.img-bolo{
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.img-bolo:hover{
+  transform: scale(1.4);
+}
+
+.preco{
+  width: fit-content;
+  height: fit-content;
+  background-color: rgb(255, 133, 133);
+  border-radius: 20px;
+
+  padding: 5px 10px;
+  white-space: nowrap;
+}
+
+.descricao{
+  padding: 5px 15px;
+  font-weight: normal;
+  display: flex;
+  text-align: center;
+  height: 100px;
+}
+
+.bolo{
+  background-color: rgba(253, 253, 224, 0.8);
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+}
+
+.objetivo{
+  font-size: 25px;
+}
+
+.card-top{
+  display: flex;
+  justify-content: space-between;
+  width: 90%;
+  padding-top: 10px;
+}
+
+.wpp, .insta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 60px;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.wpp:hover, .insta:hover {
+  transform: scale(1.2);
+}
+
+.social-links{
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 20px;
+}
