@@ -219,7 +219,7 @@ footer p {
     font-size: 40px;
   }
   .objetivo{
-    font-size: 20px;
+    font-size: 22px;
   }
   h1{
     font-size: 25px;
@@ -263,6 +263,10 @@ footer p {
   .slogan{
     width: 80%;
   }
+
+  .img-bolo:hover {
+  transform: none;
+}
 }
 
 @media screen and (max-width: 460px) {
