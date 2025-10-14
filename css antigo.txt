@@ -1,5 +1,7 @@
-* {
+*{
   font-family: "Comic Sans MS", cursive;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -8,44 +10,42 @@ body {
   padding-right: 30px;
 }
 
-header {
+header{
   position: relative;
 }
 
-.logo {
+.Logo {
   width: 100px;
   margin-bottom: 20px;
 }
 
-header div {
+
+header div{
   position: absolute;
   width: 100%;
   background: rgb(255, 133, 133);
-  padding-top: 10px;
-  padding-bottom: 15px;
+  padding: 20px;
+  padding-bottom: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   clip-path: ellipse(100% 85% at 50% 0%);
   z-index: 1;
-  display: grid;
-  grid-template-columns: 200px 1fr 1fr 1fr;
-  place-items: center;
-  align-items: center;
 }
 
-header a,
-header img {
+header a, header img{
   text-decoration: none;
   color: white;
   font-size: 30px;
   margin-bottom: 20px;
   transition: all 0.3s ease-in-out;
-  text-align: center;
 }
 
-header a:hover {
-  transform: scale(1.1);
+header a:hover{
+  transform: scale(1.10);
 }
 
-h3 {
+h3{
   color: rgb(139, 69, 19);
   height: fit-content;
   margin-top: 0;
@@ -74,7 +74,7 @@ footer p {
   font-weight: bold;
 }
 
-.bolos {
+.bolos{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 20px;
@@ -82,7 +82,7 @@ footer p {
   padding-right: 20px;
 }
 
-.slogan {
+.slogan{
   display: flex;
   justify-content: center;
   font-size: 50px;
@@ -95,13 +95,13 @@ footer p {
   font-family: "Pacifico", cursive;
 }
 
-.slogan-section {
+.slogan-section{
   position: relative;
   display: flex;
   justify-content: center;
 }
 
-.img-slogan {
+.img-slogan{
   object-fit: cover;
   width: 120%;
   height: 400px;
@@ -111,7 +111,7 @@ footer p {
   margin-top: 70px;
 }
 
-.img-bolo {
+.img-bolo{
   width: 150px;
   height: 150px;
   object-fit: cover;
@@ -119,12 +119,11 @@ footer p {
   transition: all 0.3s ease-in-out;
 }
 
-.img-bolo:hover {
+.img-bolo:hover{
   transform: scale(1.4);
 }
 
-.preco {
-  min-width: 70px;
+.preco{
   width: fit-content;
   height: fit-content;
   background-color: rgb(255, 133, 133);
@@ -134,7 +133,7 @@ footer p {
   white-space: nowrap;
 }
 
-.descricao {
+.descricao{
   padding: 5px 15px;
   font-weight: normal;
   display: flex;
@@ -142,7 +141,7 @@ footer p {
   height: 100px;
 }
 
-.bolo {
+.bolo{
   background-color: rgba(253, 253, 224, 0.8);
   display: flex;
   justify-content: space-between;
@@ -151,19 +150,18 @@ footer p {
   border-radius: 8px;
 }
 
-.objetivo {
+.objetivo{
   font-size: 25px;
 }
 
-.card-top {
+.card-top{
   display: flex;
   justify-content: space-between;
   width: 90%;
   padding-top: 10px;
 }
 
-.wpp,
-.insta {
+.wpp, .insta {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -175,114 +173,13 @@ footer p {
   transition: all 0.3s ease-in-out;
 }
 
-.wpp:hover,
-.insta:hover {
+.wpp:hover, .insta:hover {
   transform: scale(1.2);
 }
 
-.social-links {
+.social-links{
   display: flex;
   justify-content: center;
   gap: 40px;
   margin-top: 20px;
-}
-
-@media screen and (max-width: 1130px) {
-  .bolos {
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-   .slogan{
-    width: 50%;
-  }
-}
-
-@media screen and (max-width: 900px) {
-  .slogan{
-    width: 55%;
-  }
-}
-
-@media screen and (max-width: 850px) {
-  header div {
-    grid-template-columns: 150px 1fr 1fr 1fr;
-  }
-  header div a {
-    font-size: 25px;
-  }
-  .logo {
-    width: 70px;
-  }
-  .img-slogan{
-    height: 300px;
-  }
-  .slogan{
-    font-size: 40px;
-  }
-  .objetivo{
-    font-size: 20px;
-  }
-  h1{
-    font-size: 25px;
-  }
-}
-
-@media screen and (max-width: 800px) {
-  header div {
-    grid-template-columns: 150px 1fr 205px 1fr;
-  }
-}
-
-@media screen and (max-width: 750px) {
-  .bolos {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .img-slogan{
-    transform: scale(1.04);
-  }
-
-}
-
-@media screen and (max-width: 660px) {
-  header div a {
-    font-size: 20px;
-  }
-
-  .slogan{
-    width: 65%;
-  }
-}
-
-@media screen and (max-width: 560px) {
-  .bolos {
-    grid-template-columns: 1fr;
-  }
-  header div {
-    grid-template-columns: 100px 1fr 1fr 1fr;
-  }
-  .slogan{
-    width: 80%;
-  }
-}
-
-@media screen and (max-width: 460px) {
-  header div a{
-    font-size: 16px ;
-  }
-  .logo {
-    width: 50px;
-  }
-  header div {
-    grid-template-columns: 65px 1fr 1fr 1fr;
-  }
-  .img-slogan{
-    margin-top: 60px;
-    transform: scale(1.05);
-    height: 250px;
-  }
-  
-  .slogan{
-    font-size: 35px;
-    width: 90%;
-  }
 }
