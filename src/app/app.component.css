@@ -1,5 +1,5 @@
 * {
-  font-family: "Comic Sans MS", cursive;
+  font-family: "Pacifico", cursive;
   overflow: hidden;
 }
 
@@ -58,7 +58,7 @@ footer {
   text-align: center;
   padding: 80px 20px;
   border-top: 3px solid white;
-  font-family: "Comic Sans MS", cursive;
+  font-family: "Pacifico", cursive;
   letter-spacing: 0.5px;
   clip-path: ellipse(100% 50% at 50% 75%);
 }
@@ -117,6 +117,11 @@ footer p {
   object-fit: cover;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
+}
+
+.img-brigadeiro{
+  width: 240px;
+  margin-top: -30px;
 }
 
 .img-bolo:hover {
@@ -194,18 +199,14 @@ footer p {
    .slogan{
     width: 50%;
   }
-  *{
-    font-family: "Pacifico", cursive;
-  }
+ 
 }
 
 @media screen and (max-width: 900px) {
   .slogan{
     width: 55%;
   }
-  *{
-     font-family: "Pacifico", cursive;
-  }
+
 }
 
 @media screen and (max-width: 850px) {
@@ -227,12 +228,14 @@ footer p {
   .objetivo{
     font-size: 22px;
   }
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
+  }
   h1{
     font-size: 25px;
   }
-  *{
-     font-family: "Pacifico", cursive;
-  }
+
 }
 
 @media screen and (max-width: 800px) {
@@ -242,12 +245,14 @@ footer p {
   .objetivo{
     font-size: 20px;
   }
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
+  }
   h1{
     font-size: 22px;
   }
-  *{
-     font-family: "Pacifico", cursive;
-  }
+
 }
 
 @media screen and (max-width: 750px) {
@@ -258,8 +263,10 @@ footer p {
   .img-slogan{
     transform: scale(1.04);
   }
-  *{
-     font-family: "Pacifico", cursive;
+
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
   }
 
 }
@@ -272,8 +279,10 @@ footer p {
   .slogan{
     width: 65%;
   }
-  *{
-     font-family: "Pacifico", cursive;
+
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
   }
 }
 
@@ -297,8 +306,10 @@ footer p {
   h1{
     font-size: 20px;
   }
-  *{
-     font-family: "Pacifico", cursive;
+
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
   }
 }
 
@@ -328,7 +339,8 @@ footer p {
   h1{
     font-size: 18px;
   }
-  *{
-     font-family: "Pacifico", cursive;
+  .img-brigadeiro{
+    width: 240px;
+    margin-top: -30px;
   }
 }
