@@ -1,6 +1,6 @@
 <header style="display: flex; flex-direction: column">
   <div>
-    <img class="logo" src="../assets/Logo.jpg" alt="">
+    <img class="logo" src="../assets/Logo.jpg" alt="" />
     <a href="#sobre">Sobre</a>
     <a href="#sabor">Sabores e preços</a>
     <a href="#contato">Contato</a>
@@ -23,12 +23,12 @@
     <div class="bolos">
       <div class="bolo" *ngFor="let bolo of bolos">
         <div class="card-top">
-          <h3>{{bolo.sabor}}</h3>
-          <span class="preco">{{bolo.preco | currency: 'BRL'}}</span>
+          <h3>{{ bolo.sabor }}</h3>
+          <span class="preco">{{ bolo.preco | currency : "BRL" }}</span>
         </div>
         <img class="img-bolo" [src]="bolo.img" alt="" />
         <p class="descricao">
-          {{bolo.descricao}}
+          {{ bolo.descricao }}
         </p>
       </div>
     </div>
@@ -41,8 +41,7 @@
     <div class="social-links">
       <a href="https://wa.me/5511994097568" target="_blank" class="whatsapp">
         <img class="wpp" src="../assets/wpp.jpg" alt="WhatsApp" />
-      </a>
-
+      </a> 
       <a
         href="https://www.instagram.com/_ksccp10?igsh=MWsxMDB1cDN6bjBrbA%3D%3D&utm_source=qr"
         target="_blank"

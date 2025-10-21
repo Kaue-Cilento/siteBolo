@@ -21,7 +21,7 @@
         "sabor": "Ninhotella",
         "preco": "18",
         "descricao": "Massa de chocolate com recheio de nutella e de ninho, finalizado com ninho e por cima.",
-        "img": "../assets/Nutella.jpg"
+        "img": "../assets/Ninhotella.jpg"
     },
     {
         "sabor": "Cenoura com brigadeiro",
@@ -40,5 +40,12 @@
         "preco": "12",
         "descricao": "Massa branca com recheio cremoso de limão, finalizado com raspas de limão.",
         "img": "../assets/Limao.jpg"
+    },
+    {
+         "sabor": "Doce de leite com coco",
+        "preco": "15",
+        "descricao": "Massa branca com recheio de doce de leite e coco, decorado com coco por cima. ",
+        "img": ""
     }
+    
 ]
