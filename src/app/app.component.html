@@ -22,87 +22,14 @@
     <h1 id="sabor">Sabores e preços</h1>
 
     <div class="bolos">
-      <div class="bolo">
+      <div class="bolo" *ngFor="let bolo of bolos">
         <div class="card-top">
-          <h3>Brigadeiro</h3>
-          <span class="preco">R$ 12,00</span>
+          <h3>{{bolo.sabor}}</h3>
+          <span class="preco">{{bolo.preco | currency: 'BRL'}}</span>
         </div>
-        <img class="img-bolo img-brigadeiro" src="../assets/Brigadeiro.jpg" alt="" />
+        <img class="img-bolo" [src]="bolo.img" alt="" />
         <p class="descricao">
-          Massa de chocolate com recheio de brigadeiro caseiro, finalizado com
-          granulado.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Prestígio</h3>
-          <span class="preco">R$ 12,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/Prestigio.jpg" alt="" />
-        <p class="descricao">
-          Massa de chocolate com recheio de coco caseiro (beijinho), e decorado
-          com coco ralado.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Ninho</h3>
-          <span class="preco">R$ 15,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/ninho.jpg" alt="" />
-        <p class="descricao">
-          Massa branca de pandeló com recheio de creme de ninho, com um toque de
-          ninho por cima.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Ninhotella</h3>
-          <span class="preco">R$ 18,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/Nutella.jpg" alt="" />
-        <p class="descricao">
-          Massa de chocolate com recheio de nutella e de ninho,
-          finalizado com ninho e por cima.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Cenoura com brigadeiro</h3>
-          <span class="preco">R$ 12,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/Cenoura.jpg" alt="" />
-        <p class="descricao">
-          Massa de cenoura, com recheio intercalados de brigadeiro, finalizado
-          com granulado.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Abacaxi</h3>
-          <span class="preco">R$ 15,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/Abacaxi.jpg" alt="" />
-        <p class="descricao">
-          Massa branca com recheio de creme com pedaços de abacaxi, finalizado
-          com pedaços de abacaxi.
-        </p>
-      </div>
-
-      <div class="bolo">
-        <div class="card-top">
-          <h3>Limão</h3>
-          <span class="preco">R$ 12,00</span>
-        </div>
-        <img class="img-bolo" src="../assets/Limao.jpg" alt="" />
-        <p class="descricao">
-          Massa branca com recheio cremoso de limão, finalizado com raspas de
-          limão.
+          {{bolo.descricao}}
         </p>
       </div>
     </div>

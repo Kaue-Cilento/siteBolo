@@ -1,0 +1,284 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from 'src/app/services/auth.service';
+import { UsuarioService } from 'src/app/services/usuario.service';
+import {
+  LocalNotifications,
+  LocalNotificationSchema,
+} from '@capacitor/local-notifications';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.page.html',
+  styleUrls: ['./login.page.scss'],
+  standalone: false,
+})
+export class LoginPage implements OnInit {
+  model: any = {};
+  constructor(
+    public router: Router,
+    private authService: AuthService,
+    public toastrService: ToastrService,
+    private alertController: AlertController,
+    private usuarioService: UsuarioService
+  ) {}
+
+  async ngOnInit() {
+    this.toastrService.toastrConfig.positionClass = 'toast-center-center';
+    if (localStorage.getItem('token') !== null) {
+      this.router.navigate(['/home']);
+      this.router.navigate(['/cadastro']);
+    }
+
+    this.ScheduleNotification();
+  }
+  public async login() {
+    this.authService.login(this.model).subscribe(
+      (user) => {
+        if (user) {
+          console.log('Login realizado:', user);
+          this.router.navigate(['/home']);
+        } else {
+          this.showAlert('Usuário ou senha incorretos');
+        }
+      },
+      (error) => {
+        console.error(error);
+        this.showAlert('Erro no login: ' + error.message);
+      }
+    );
+  }
+
+  private async showAlert(message: string) {
+    const alert = await this.alertController.create({
+      header: 'Atenção',
+      message,
+      cssClass: 'alert',
+      buttons: [{ text: 'Ok', cssClass: 'alert-button-main' }],
+    });
+    await alert.present();
+  }
+
+
+  public async cadastro() {
+    this.router.navigate(['/cadastro']);
+  }
+
+  ScheduleNotification() {
+    var options: LocalNotificationSchema = {
+      id: 12345,
+      title: 'teste',
+      body: 'teste body',
+      summaryText: 'teste SummaryText',
+      largeBody: 'largeBodyTeste',
+      schedule: {
+        repeats: true,
+        //every: "day",
+        on: {
+          weekday: 2,
+          hour: 15,
+          minute: 20,
+          second: 1,
+        },
+      },
+    };
+    LocalNotifications.schedule({ notifications: [options] });
+  }
+
+  backEndData: string | undefined;
+  sqlData: string | undefined;
+  FirebirdData: string | undefined;
+  async testConnections() {
+    this.usuarioService.testBackEnd().subscribe((data) => {
+      this.backEndData = data;
+      console.log(data);
+    });
+    this.usuarioService.testSql().subscribe((data) => {
+      this.sqlData = data;
+      console.log(data);
+    });
+    this.usuarioService.testFirebird().subscribe((data) => {
+      this.FirebirdData = data;
+      console.log(data);
+    });
+
+    const alert = await this.alertController.create({
+      header:
+        //'Login Inválido',
+        'testeSql: ' +
+        this.sqlData +
+        ', ' +
+        'testeBackEnd: ' +
+        this.backEndData +
+        ', ' +
+        'testeFirebird: ' +
+        this.FirebirdData,
+      cssClass: 'alert',
+      buttons: [
+        {
+          text: 'Ok',
+          cssClass: 'alert-button-main',
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+}
+
+
+
+
+
+
+
+
+
+import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { User } from './../interfaces/user';
+import { Injectable } from '@angular/core';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { map } from 'rxjs/operators';
+import { UsuarioService } from './usuario.service';
+import { UrlService } from './url.service';
+import { UsuarioSoft } from '../_models/usuarioSoft.model';
+
+const minutosAutoLogout = 30;
+const checkInternal = 15000;
+const storeKey = 'lastAction';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  baseUrl = this.urlService.url + 'UsuarioSoft';
+  jwtHelper = new JwtHelperService();
+  decodedToken: any;
+  redeloja: any;
+  userRegister: User = {
+    editando: false,
+  };
+
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': '*',
+      'Access-Control-Allow-Headers': '*',
+      'Access-Control-Allow-Credentials': 'true',
+    }),
+  };
+
+  constructor(
+    private httpCliente: HttpClient,
+    private router: Router,
+    private usuarioService: UsuarioService,
+    private urlService: UrlService
+  ) {
+    this.check();
+    this.initListener();
+    this.initInterval();
+    localStorage.setItem(storeKey, Date.now().toString());
+  }
+
+  check() {
+    const now = Date.now();
+    const timeleft = this.getLastAction() + minutosAutoLogout * 30 * 1000;
+    const diff = timeleft - now;
+    const isTimeout = diff < 0;
+
+    if (isTimeout) {
+      localStorage.clear();
+      this.router.navigate(['/login']);
+    }
+  }
+  public getLastAction() {
+    const value = localStorage.getItem(storeKey);
+    return value ? parseInt(value) : 0;
+  }
+  public setLastAction(lastAction: number) {
+    localStorage.setItem(storeKey, lastAction.toString());
+  }
+
+  initListener() {
+    document.body.addEventListener('click', () => this.reset());
+    document.body.addEventListener('mouseover', () => this.reset());
+    document.body.addEventListener('mouseout', () => this.reset());
+    document.body.addEventListener('keydown', () => this.reset());
+    document.body.addEventListener('keyup', () => this.reset());
+    document.body.addEventListener('keypress', () => this.reset());
+  }
+  reset() {
+    this.setLastAction(Date.now());
+  }
+  initInterval() {
+    setInterval(() => {
+      this.check();
+    }, checkInternal);
+  }
+  loggedIn() {
+    const token = localStorage.getItem('token');
+    return !this.jwtHelper.isTokenExpired(token);
+  }
+  register(usuario: User) {
+    return this.httpCliente.post<User>(
+      `${this.baseUrl}/criar`,
+      usuario,
+      this.httpOptions
+    );
+  }
+
+  login(model: UsuarioSoft) {
+    return this.httpCliente
+      .post<{ nM_USUARIO: string; nM_LOGIN: string }>(
+        `${this.baseUrl}/LoginSoft`,
+        model,
+        this.httpOptions
+      )
+      .pipe(
+        map(user => {
+          if(user) {
+            localStorage.setItem('user', JSON.stringify({
+              nome: user.nM_USUARIO,
+              login: user.nM_LOGIN
+            }));
+          }
+          return user;
+        })
+      );
+  }
+
+
+
+
+
+  relogin() {
+    /*   const decodedDetails = JSON.parse(window.atob(localStorage.getItem('token').split('.')[1])); */
+    const model: any = {
+      password: null,
+      /*       userName: decodedDetails.unique_name */
+    };
+    this.httpCliente
+      .post(`${this.baseUrl}/Relogin`, model, this.httpOptions)
+      .pipe(
+        map((response: any) => {
+          const user = response;
+          console.log(response);
+          if (user) {
+            localStorage.setItem('token', user.token);
+            this.decodedToken = this.jwtHelper.decodeToken(user.token);
+            sessionStorage.setItem('username', this.decodedToken.unique_name);
+            localStorage.setItem(
+              'rolesUsuario',
+              JSON.stringify(this.decodedToken.role)
+            );
+            localStorage.setItem('user', this.decodedToken.unique_name);
+          }
+        })
+      )
+      .subscribe(() => {});
+  }
+}

@@ -1,0 +1,44 @@
+[
+    {
+        "sabor": "Brigadeiro",
+        "preco": "12",
+        "descricao": "Massa de chocolate com recheio de brigadeiro caseiro, finalizado com granulado.",
+        "img": "../assets/Brigadeiro.jpg"
+    },
+    {
+        "sabor": "Prestigio",
+        "preco": "12",
+        "descricao": "Massa de chocolate com recheio de coco caseiro (beijinho), e decorado com coco ralado.",
+        "img": "../assets/Prestigio.jpg"
+    },
+    {
+        "sabor": "Ninho",
+        "preco": "15",
+        "descricao": "Massa branca de pandeló com recheio de creme de ninho, com um toque de ninho por cima.",
+        "img": "../assets/ninho.jpg"
+    },
+    {
+        "sabor": "Ninhotella",
+        "preco": "18",
+        "descricao": "Massa de chocolate com recheio de nutella e de ninho, finalizado com ninho e por cima.",
+        "img": "../assets/Nutella.jpg"
+    },
+    {
+        "sabor": "Cenoura com brigadeiro",
+        "preco": "12",
+        "descricao": "Massa de cenoura, com recheio intercalados de brigadeiro, finalizado com granulado.",
+        "img": "../assets/Cenoura.jpg"
+    },
+    {
+        "sabor": "Abacaxi",
+        "preco": "15",
+        "descricao": "Massa branca com recheio de creme com pedaços de abacaxi, finalizado com pedaços de abacaxi.",
+        "img": "../assets/Abacaxi.jpg"
+    },
+    {
+        "sabor": "Limao",
+        "preco": "12",
+        "descricao": "Massa branca com recheio cremoso de limão, finalizado com raspas de limão.",
+        "img": "../assets/Limao.jpg"
+    }
+]
