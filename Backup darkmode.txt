@@ -1,0 +1,1009 @@
+Backup darkmode
+
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+<!--     <ion-buttons slot="start">
+      <ion-button color="dark" fill="clear" (click)="toggleDarkMode()">
+        <ion-icon [name]="getThemeIcon()" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons> -->
+
+    <ion-title style="text-align: center; color: black;"><b>HOME</b></ion-title>
+    <ion-buttons slot="end">
+      <ion-button color="light" fill="clear" (click)="abrirPerfil($event)">
+        <ion-icon name="person-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item
+    lines="none"
+    class="ion-margin-vertical"
+    style="margin-top: 50px;"
+  >
+    <ion-label style="color: black;">
+      Olá, Seja Bem-Vindo!
+      <p><ion-text style="color:black"> {{ getUserName() }} </ion-text></p>
+    </ion-label>
+    <ion-img [src]="'assets/img/logoSRCX.png'"></ion-img>
+  </ion-item>
+
+  <ion-list-header class="ion-text-center" style="margin-top: 50px; color: black;">
+    Menu
+  </ion-list-header>
+
+  <!-- Mostrar código escaneado -->
+  <ion-item lines="none" *ngIf="scannedCode">
+    <ion-label>
+      <p style="text-align: center; font-weight: bold">
+        Código escaneado: {{ scannedCode }}
+      </p>
+    </ion-label>
+  </ion-item>
+
+  <!-- Mostrar foto associada ao código -->
+  <ion-card *ngIf="romaneioAtual?.foto" class="ion-margin-vertical">
+    <ion-card-header>
+      <ion-card-title>Código: {{ romaneioAtual?.codigo }}</ion-card-title>
+    </ion-card-header>
+    <ion-img [src]="'data:image/jpeg;base64,' + romaneioAtual?.foto"></ion-img>
+  </ion-card>
+
+  <ion-row class="ion-margin">
+    <!-- Botão de escanear e tirar foto -->
+    <ion-col size="6" class="ion-text-center center-col">
+      <ion-card  (click)="scanAndPhoto()">
+        <ion-thumbnail [style.background]="'rgba(252, 0, 0, 0.8)'">
+          <ion-icon name="scan-outline" style="color:black"></ion-icon>
+        </ion-thumbnail>
+        <ion-label style="color: black;">Escanear cód do Romaneio</ion-label>
+      </ion-card>
+    </ion-col>
+
+    <ion-col size="6" class="ion-text-center center-col">
+      <ion-card  (click)="listaPedidos()">
+        <ion-thumbnail [style.background]="'rgba(0, 80, 255, 1)'">
+          <ion-icon name="document-text-outline" style="color:black"></ion-icon>
+        </ion-thumbnail>
+        <div style="height: 35px; color: black;"><ion-label>Lista de Pedidos</ion-label></div>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <div class="creditos"
+    style="text-align: center; margin-top: 390px; font-size: 14px; color: black;"
+  >
+    Desenvolvido pelo Team T.I.
+    <ion-icon style="font-size: 0.8rem" name="heart" color="danger"></ion-icon>
+  </div>
+</ion-content>
+
+ion-header {
+  ion-toolbar {
+    --background: rgb(255, 255, 255);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    text-align: center;
+  }
+}
+
+ion-content {
+  --background: rgb(230, 231, 233);
+}
+
+ion-item {
+  --background: rgba(255, 255, 255, 0);
+  ion-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    p {
+      margin-top: 10px;
+      font-size: 1rem;
+      font-weight: normal;
+    }
+  }
+
+  ion-img {
+    width: 150px;
+    height: 100px;
+  }
+}
+
+ion-list-header {
+  font-size: 1.5rem;
+  font-weight: normal;
+  margin-left: 40%;
+}
+
+ion-card {
+  background-color: azure;
+  height: 15vh;
+  flex-direction: column;
+  margin: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  ion-thumbnail {
+    border-radius: 10px;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1.3rem;
+    ion-icon {
+      font-size: 2rem;
+    }
+  }
+  ion-label {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+}
+
+ion-card,
+ion-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+import { Component, OnInit } from '@angular/core';
+import { Romaneio } from '../../_models/romaneio.model';
+import { AlertController, PopoverController } from '@ionic/angular';
+import { PhotoService } from '../../services/photo.service';
+import { RomaneioService } from '../../services/romaneio.service';
+import { CapacitorBarcodeScanner } from '@capacitor/barcode-scanner';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { UsuarioService } from 'src/app/services/usuario.service';
+import { PerfilPage } from 'src/app/pages/perfil/perfil.page';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss'],
+  standalone: false,
+})
+export class HomePage implements OnInit {
+  codigo?: string; // EAN-8
+  foto?: string; // base64 da foto
+
+  romaneioAtual: Romaneio | null = null;
+  scannedCode: string = '';
+  usuario: any = {};
+  darkMode: boolean = false;
+
+  constructor(
+    public router: Router,
+    private alertController: AlertController,
+    public photoService: PhotoService,
+    private romaneioService: RomaneioService,
+    private usuarioService: UsuarioService,
+    private popoverCtrl: PopoverController
+  ) {}
+
+  ngOnInit() {
+    console.log('ngOnInit funvionou');
+    this.romaneioService.Teste().subscribe((data) => {
+      console.log(data);
+    });
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redireciona para login
+      this.router.navigate(['/login']);
+    } else {
+      // Se tiver token, pega o usuário
+      console.log(localStorage)
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        this.usuario = userString; // agora vai ter usuario.nome, usuario.cpf, etc
+      }
+    }
+
+    const tema = localStorage.getItem('tema');
+    this.darkMode = tema === 'dark';
+    this.updateBodyClass();
+  }
+
+  // PARA TESTES
+
+/*    ngOnInit() {
+    console.log('ngOnInit funcionando');
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      this.usuario = JSON.parse(userString);
+    }
+
+    const tema = localStorage.getItem('tema');
+    this.darkMode = tema === 'dark';
+    this.updateBodyClass();
+
+    // 👇 Simulação de scan quando estiver testando via navegador
+    if (window.location.hostname === 'localhost') {
+      const codigoSimulado = '00003652';
+      this.simularScan(codigoSimulado);
+    }
+  } */
+
+/*    async simularScan(codigo: string) {
+    try {
+      const cd = Number(codigo);
+      if (isNaN(cd)) {
+        this.presentAlert('Código inválido na simulação!');
+        return;
+      }
+
+      console.log('🔍 Simulando leitura do código', cd);
+
+      // Busca os dados do romaneio normalmente
+      this.romaneioService.GetRomaneios(cd).subscribe({
+        next: (dados) => {
+          if (dados && dados.length > 0) {
+            const romaneios: Romaneio[] = dados.map((info) => ({
+              cD_ENTREGACAB: info.cD_ENTREGACAB,
+              cD_PEDIDO: info.cD_PEDIDO,
+              nM_FANTASIA: info.nM_FANTASIA,
+              nM_ENDERECO_ENT: info.nM_ENDERECO_ENT,
+              cD_NUMERO_ENT: info.cD_NUMERO_ENT,
+              cD_CEP_ENT: info.cD_CEP_ENT,
+              cD_ENTREGADOR: info.cD_ENTREGADOR,
+              nM_TRANSPORTADORA: info.nM_TRANSPORTADORA,
+              codigo: cd.toString(),
+              foto: '', // sem foto no modo teste
+            })); console.log(romaneios)
+
+            this.romaneioService.setRomaneios(romaneios);
+            this.presentAlert(`Simulação: dados do romaneio ${cd} carregados!`);
+
+            // Vai pra lista de pedidos automaticamente
+            this.router.navigate(['/list-pedidos']);
+          } else {
+            this.presentAlert('Nenhum romaneio encontrado na simulação.');
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          this.presentAlert('Erro ao buscar dados do romaneio simulado.');
+        },
+      });
+    } catch (e) {
+      console.error('Erro ao simular o romaneio', e);
+      this.presentAlert('Erro ao simular o romaneio.');
+    }
+  }
+ */
+
+  public async listaPedidos() {
+    this.router.navigate(['/list-pedidos']);
+  }
+
+  toggleDarkMode() {
+    this.darkMode = !this.darkMode;
+    // Salva a escolha do usuário
+    localStorage.setItem('tema', this.darkMode ? 'dark' : 'light');
+    this.updateBodyClass();
+  }
+
+  updateBodyClass() {
+    const body = document.body;
+    if (this.darkMode) {
+      body.classList.add('dark');
+    } else {
+      body.classList.remove('dark');
+    }
+  }
+
+  getThemeIcon() {
+    return this.darkMode ? 'moon-outline' : 'sunny-outline';
+  }
+
+  async abrirPerfil(ev: any) {
+    const popover = await this.popoverCtrl.create({
+      component: PerfilPage,
+      event: ev,
+      translucent: true,
+      componentProps: {
+        username: this.usuario,
+        fullname: this.usuario.fullname,
+        email: this.usuario.email,
+      },
+    });
+
+    await popover.present();
+  }
+
+  async scanAndPhoto() {
+    document.body.classList.add('barcode-scanner-active');
+
+    try {
+      const result = await CapacitorBarcodeScanner.scanBarcode({
+        hint: 10,
+        cameraDirection: 1,
+      });
+
+      // Limpeza do código escaneado
+      let rawCode = result.ScanResult?.trim() || '';
+
+      // Remove qualquer caractere não numérico
+      rawCode = rawCode.replace(/[^0-9]/g, '');
+
+      // Remove o dígito verificador (último número)
+      if (rawCode.length > 1) {
+        rawCode = rawCode.slice(0, -1);
+      }
+
+      const cd = Number(rawCode);
+
+      if (isNaN(cd)) {
+        this.presentAlert('Código inválido para envio!');
+        return;
+      }
+
+      this.scannedCode = rawCode;
+      this.romaneioAtual = { codigo: this.scannedCode };
+
+      // Tirar a foto
+      const capturedPhoto = await Camera.getPhoto({
+        quality: 80,
+        resultType: CameraResultType.Base64,
+        source: CameraSource.Camera,
+      });
+
+      if (capturedPhoto.base64String) {
+        // Converte foto para blob
+        const byteCharacters = atob(capturedPhoto.base64String);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+        const fileName = `${cd}_Imagem.jpg`;
+        const formData = new FormData();
+        formData.append('file', blob, fileName);
+
+        // Upload da imagem
+        await this.romaneioService.AddFiles(formData, cd).toPromise();
+        this.presentAlert(`Foto enviada para o romaneio ${cd}`);
+
+        // Buscar dados do romaneio pelo código
+        this.romaneioService.GetRomaneios(cd).subscribe({
+          next: (dados) => {
+            if (dados && dados.length > 0) {
+              const romaneios: Romaneio[] = dados.map((info) => ({
+                cD_ENTREGACAB: info.cD_ENTREGACAB,
+                cD_PEDIDO: info.cD_PEDIDO,
+                nM_FANTASIA: info.nM_FANTASIA,
+                nM_ENDERECO_ENT: info.nM_ENDERECO_ENT,
+                cD_NUMERO_ENT: info.cD_NUMERO_ENT,
+                cD_CEP_ENT: info.cD_CEP_ENT,
+                cD_ENTREGADOR: info.cD_ENTREGADOR,
+                nM_TRANSPORTADORA: info.nM_TRANSPORTADORA,
+                codigo: cd.toString(),
+                foto: capturedPhoto.base64String,
+              }));
+
+              // Substitui completamente os dados locais
+              // (para evitar misturar romaneios diferentes)
+              this.romaneioService.setRomaneios(romaneios);
+
+              // Vai pra lista de pedidos
+              this.router.navigate(['/list-pedidos']);
+            } else {
+              this.presentAlert('Nenhum romaneio encontrado para este código.');
+            }
+          },
+          error: (err) => {
+            console.error(err);
+            this.presentAlert('Erro ao buscar dados do romaneio.');
+          },
+        });
+      }
+    } catch (e) {
+      console.error('Erro ao processar romaneio', e);
+      this.presentAlert('Erro ao processar o romaneio.');
+    } finally {
+      document.body.classList.remove('barcode-scanner-active');
+    }
+  }
+
+  getUserName(): string | null {
+    const nome =
+      localStorage.getItem('username') || sessionStorage.getItem('username');
+    if (nome) return nome;
+    const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+    if (user) return user;
+    return null;
+  }
+
+  async presentAlert(message: string) {
+    const alert = await this.alertController.create({
+      header: 'Aviso',
+      message,
+      buttons: ['OK'],
+    });
+    await alert.present();
+  }
+}
+
+
+
+
+
+
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="voltarHome()">
+        <ion-icon slot="icon-only" name="arrow-back-outline" style="color: black;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title style="text-align: center; color: black;">Lista de Pedidos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="carregarPedidosRecentes()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="carregando" class="carregando">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Carregando pedidos...</p>
+  </div>
+
+  <ion-list
+    *ngIf="pedidos.length > 0; else semPedidos"
+    style="background-color: rgb(230, 231, 233)"
+  >
+    <ion-card *ngFor="let pedido of pedidos" (click)="verDetalhes(pedido)">
+      <ion-card-header>
+        <ion-card-title>Pedido: {{ pedido.cD_PEDIDO }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content style="color: black;">
+        <p>
+          <strong>Motorista:</strong> {{ pedido.cD_ENTREGADOR }} -
+          {{pedido.nM_TRANSPORTADORA}}
+        </p>
+        <p><strong>Cliente:</strong> {{ pedido.nM_FANTASIA }}</p>
+        <p>
+          <strong>Endereço:</strong> {{ pedido.nM_ENDERECO_ENT }}, {{
+          pedido.cD_NUMERO_ENT }} - CEP: {{ pedido.cD_CEP_ENT }}
+        </p>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <ng-template #semPedidos>
+    <ion-text color="medium">
+      <p style="text-align: center; margin-top: 20px">
+        Nenhum pedido recente encontrado.
+      </p>
+    </ion-text>
+  </ng-template>
+</ion-content>
+
+
+ion-header {
+  ion-toolbar {
+    --background: rgb(255, 255, 255);
+    --color: #fff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    text-align: center;
+  }
+
+  ion-title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-size: 1.3rem;
+  }
+
+  ion-button {
+    --color: #fff;
+  }
+}
+
+ion-content {
+  --background: #e6e7e9;
+  font-family: "Roboto", sans-serif;
+  color: #fff;
+  padding-top: 10px;
+}
+
+.carregando {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  color: #ccc;
+  text-align: center;
+
+  ion-spinner {
+    --color: #ff3b3b;
+    transform: scale(1.5);
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
+
+ion-list {
+  background: transparent;
+}
+
+/* ======== ESTILO DOS CARDS ======== */
+ion-card {
+  margin: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:hover {
+    box-shadow: 0 0 15px rgba(255, 59, 59, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  ion-card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 6px;
+  }
+
+  ion-card-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #000000;
+    text-align: center;
+  }
+
+  ion-card-content {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding-top: 6px;
+
+    p {
+      margin: 6px 0;
+      color: #030303;
+
+      strong {
+        color: #000000;
+      }
+    }
+  }
+}
+
+/* ======== MENSAGEM SEM PEDIDOS ======== */
+ion-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #aaa;
+  font-size: 1rem;
+
+  p {
+    text-align: center;
+    margin-top: 20px;
+  }
+}
+
+/* ======== BOTÕES GERAIS ======== */
+ion-button {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 12px;
+  transition: transform 0.1s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &[color="success"] {
+    --background: linear-gradient(90deg, #1db954, #0f8a3d);
+  }
+
+  &[color="danger"] {
+    --background: linear-gradient(90deg, #ff3b3b, #b80000);
+  }
+}
+
+/* ======== REFRESH ======== */
+ion-refresher-content {
+  color: #ff3b3b;
+  font-weight: 600;
+}
+
+
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NavController, ToastController } from '@ionic/angular';
+import { Romaneio } from 'src/app/_models/romaneio.model';
+import { RomaneioService } from 'src/app/services/romaneio.service';
+import { PedidosService } from './pedidos.service';
+
+@Component({
+  selector: 'app-list-pedidos',
+  templateUrl: './list-pedidos.page.html',
+  styleUrls: ['./list-pedidos.page.scss'],
+  standalone: false,
+})
+export class ListPedidosPage implements OnInit {
+  pedidos: Romaneio[] = [];
+  carregando = true;
+
+  constructor(
+    private romaneioService: RomaneioService,
+    private router: Router,
+    private toastCtrl: ToastController,
+    private navCtrl: NavController,
+    private pedidosService: PedidosService
+  ) {}
+
+  ngOnInit() {
+    this.carregarPedidosRecentes();
+  }
+
+  carregarPedidosRecentes() {
+    this.pedidos = this.pedidosService.getPedidos();
+    this.carregando = false;
+  }
+
+  // Quando clicar no pedido, vai para a página de detalhes
+  verDetalhes(pedido: Romaneio) {
+    this.router.navigate(['./detalhes-pedidos', pedido.codigo]);
+  }
+
+  async showToast(message: string, color: string) {
+    const toast = await this.toastCtrl.create({
+      message,
+      color,
+      duration: 2500,
+      position: 'bottom',
+    });
+    toast.present();
+  }
+
+  voltarHome() {
+    this.router.navigate(['/home']);
+  }
+}
+
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="router.navigate(['/list-pedidos'])">
+        <ion-icon slot="icon-only" name="arrow-back-outline" style="color: black;"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title style="color: black;">Detalhes do Pedido</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" *ngIf="pedido">
+  <ion-card-content style="color: black;">
+    <h2>Pedido: {{ pedido.cD_PEDIDO }}</h2>
+    <p>
+      <strong>Motorista:</strong> {{ pedido.cD_ENTREGADOR }} -
+      {{pedido.nM_TRANSPORTADORA}}
+    </p>
+    <p><strong>Cliente:</strong> {{ pedido.nM_FANTASIA }}</p>
+    <p>
+      <strong>Endereço:</strong> {{ pedido.nM_ENDERECO_ENT }}, {{
+      pedido.cD_NUMERO_ENT }} - CEP: {{ pedido.cD_CEP_ENT }}
+    </p>
+  </ion-card-content>
+
+  <ion-button
+    style="font-weight: 600"
+    expand="block"
+    color="success"
+    (click)="marcarRealizada()"
+    >Realizada</ion-button
+  >
+  <ion-button expand="block" color="danger" (click)="abrirMotivosNaoRealizada()"
+    >Não Realizada</ion-button
+  >
+</ion-content>
+
+<!-- MODAL DE MOTIVOS -->
+<ion-modal [isOpen]="mostrarModal" (didDismiss)="fecharModal()">
+  <ng-template>
+    <ion-header>
+      <ion-toolbar color="danger">
+        <ion-title>Motivos</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="fecharModal()" style="font-weight: 600"
+            >Fechar</ion-button
+          >
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <ion-list>
+        <!-- Adicionar novo motivo -->
+        <div class="novo-motivo">
+          <!-- Se não estiver criando novo motivo, mostra o botão -->
+          <ion-button
+            *ngIf="!criandoNovoMotivo"
+            color="medium"
+            fill="outline"
+            (click)="iniciarNovoMotivo()"
+          >
+            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+            Adicionar novo motivo
+          </ion-button>
+
+          <!-- Campo de input quando clicou em adicionar -->
+          <div *ngIf="criandoNovoMotivo" class="campo-novo-motivo">
+            <ion-input
+              [(ngModel)]="novoMotivo"
+              placeholder="Digite o novo motivo"
+              clearInput
+            ></ion-input>
+            <ion-button
+              color="success"
+              size="small"
+              (click)="adicionarMotivo()"
+            >
+              <ion-icon name="checkmark-outline"></ion-icon>
+            </ion-button>
+            <ion-button
+              color="danger"
+              size="small"
+              (click)="cancelarNovoMotivo()"
+            >
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+
+        <ion-item *ngFor="let motivo of motivos">
+          <ion-checkbox
+            slot="start"
+            [(ngModel)]="motivo.selecionado"
+          ></ion-checkbox>
+          <ion-label>{{ motivo.descricao }}</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Campo de observação -->
+      <ion-item lines="none">
+        <ion-label position="stacked">Observações (Opcional)</ion-label>
+        <ion-textarea
+          [(ngModel)]="observacao"
+          placeholder="Descreva o motivo com mais detalhes..."
+          autoGrow="true"
+        ></ion-textarea>
+      </ion-item>
+
+      <!-- Adicionar novo motivo -->
+
+      <ion-button
+        expand="block"
+        color="danger"
+        (click)="confirmarNaoRealizada()"
+      >
+        Confirmar
+      </ion-button>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+
+ion-header {
+  ion-toolbar {
+    --background: rgb(230, 231, 233);
+    --color: #fff;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+  }
+
+  ion-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-align: start;
+  }
+
+  ion-button {
+    --color: #fff;
+  }
+}
+
+ion-content {
+  --background: #e6e7e9;
+  color: #fff;
+  font-family: "Roboto", sans-serif;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    font-weight: 700;
+    color: #000000;
+    text-align: center;
+  }
+
+  p {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    strong {
+      color: #000000;
+    }
+  }
+
+  ion-button {
+    border-radius: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-top: 10px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+
+    &[color="success"] {
+      --background: linear-gradient(90deg, #1db954, #0f8a3d);
+    }
+
+    &[color="danger"] {
+      --background: linear-gradient(90deg, #ff3b3b, #b80000);
+    }
+
+    &:active {
+      transform: scale(0.98);
+      transition: 0.1s ease;
+    }
+  }
+}
+
+/* ===========================
+   MODAL - MOTIVOS
+=========================== */
+ion-modal {
+  --backdrop-opacity: 0.75;
+  --width: 90%;
+  --height: 65%;
+  --border-radius: 25px;
+  --background: rgba(25, 25, 25, 0.97);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  box-shadow: 0 0 25px rgba(255, 59, 59, 0.2);
+
+  /* Moldura cinza ao redor (discreta e elegante) */
+  border: 1px solid rgba(200, 200, 200, 0.2);
+}
+
+/* Mantém o cabeçalho do mesmo jeito */
+ion-toolbar[color="danger"] {
+  --background: linear-gradient(90deg, #ff3b3b, #b80000);
+  --color: #fff;
+  text-align: center;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+
+  /* Borda cinza sutil entre o header e o corpo */
+  border-bottom: 1px solid rgba(200, 200, 200, 0.2);
+}
+
+/* Dá continuidade visual na moldura pelas laterais e base */
+ion-content::part(scroll) {
+  border-left: 1px solid rgba(200, 200, 200, 0.2);
+  border-right: 1px solid rgba(200, 200, 200, 0.2);
+  border-bottom: 1px solid rgba(200, 200, 200, 0.2);
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
+}
+
+ion-list {
+  background: transparent;
+  margin-top: 8px;
+
+  ion-item {
+    --background: rgba(255, 255, 255, 0.07);
+    --color: #fff;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    transition: 0.2s;
+
+    &:hover {
+      transform: scale(1.02);
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  ion-checkbox {
+    --size: 22px;
+    --checkmark-color: #ff3b3b;
+    --border-color: #ff3b3b;
+  }
+}
+
+ion-textarea {
+  --padding-top: 10px; /* deixa o texto e placeholder mais próximos do topo */
+  --background: rgba(255, 255, 255, 0);
+  --color: #fff;
+  border-radius: 92px;
+  margin-top: 12px;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+ion-label {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #fff;
+}
+
+ion-button[color="danger"] {
+  --background: linear-gradient(90deg, #ff3b3b, #b80000);
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+ion-button[color="medium"] {
+  --background: rgba(255, 255, 255, 0.15);
+  --color: #fff;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.novo-motivo {
+  margin-bottom: 30px;
+  text-align: center;
+
+  ion-button[color="medium"] {
+    --border-color: rgba(255, 255, 255, 0.3);
+    --color: #fff;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .campo-novo-motivo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    ion-input {
+      --background: rgba(255, 255, 255, 0.07);
+      border-radius: 10px;
+      padding: 6px 10px;
+      color: #fff;
+      flex: 1;
+    }
+
+    ion-button[color="success"] {
+      --background: linear-gradient(90deg, #1db954, #0f8a3d);
+      border-radius: 10px;
+      font-weight: 600;
+    }
+  }
+}
